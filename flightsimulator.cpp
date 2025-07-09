@@ -11,7 +11,7 @@
 std::array<bool, 256> keys;
 
 // Flight variables
-float aircraftX = 0.0f, aircraftY = 150.0f, aircraftZ = 0.0f; // Force aircraft high above terrain for debug
+float aircraftX = 0.0f, aircraftY = 50.0f, aircraftZ = 0.0f;
 float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 float velocity = 2.0f;  // Start with some default velocity
 float throttle = 0.3f;  // Start with 30% throttle
@@ -34,8 +34,6 @@ void DrawAircraft();
 void DrawTerrain();
 void DrawHUD();
 void GenerateTerrain();
-void SetupProjection(GLFWwindow* window);
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 // Generate simple terrain
 void GenerateTerrain() {
@@ -101,43 +99,23 @@ void DrawAircraft() {
     glVertex3f(-10.0f, 0.0f, 2.0f);
     glEnd();
 
-    // DEBUG: Draw a large white cube at the aircraft position
-    glColor3f(1.0f, 1.0f, 1.0f);
-    float s = 5.0f;
-    glBegin(GL_QUADS);
-    // Front face
-    glVertex3f(-s, -s,  s); glVertex3f( s, -s,  s); glVertex3f( s,  s,  s); glVertex3f(-s,  s,  s);
-    // Back face
-    glVertex3f(-s, -s, -s); glVertex3f(-s,  s, -s); glVertex3f( s,  s, -s); glVertex3f( s, -s, -s);
-    // Left face
-    glVertex3f(-s, -s, -s); glVertex3f(-s, -s,  s); glVertex3f(-s,  s,  s); glVertex3f(-s,  s, -s);
-    // Right face
-    glVertex3f( s, -s, -s); glVertex3f( s,  s, -s); glVertex3f( s,  s,  s); glVertex3f( s, -s,  s);
-    // Top face
-    glVertex3f(-s,  s, -s); glVertex3f(-s,  s,  s); glVertex3f( s,  s,  s); glVertex3f( s,  s, -s);
-    // Bottom face
-    glVertex3f(-s, -s, -s); glVertex3f( s, -s, -s); glVertex3f( s, -s,  s); glVertex3f(-s, -s,  s);
-    glEnd();
-
     glEnable(GL_LIGHTING);
     glPopMatrix();
-
-    // DEBUG: Print aircraft position
-    printf("Aircraft position: X=%.2f Y=%.2f Z=%.2f\n", aircraftX, aircraftY, aircraftZ);
 }
 
 // Draw terrain
-// void DrawTerrain() {
-//     glColor3f(0.2f, 0.8f, 0.2f); // Green terrain
-//     for (int x = 0; x < TERRAIN_SIZE - 1; ++x) {
-//         glBegin(GL_TRIANGLE_STRIP);
-//         for (int z = 0; z < TERRAIN_SIZE; ++z) {
-//             glVertex3f((x - TERRAIN_SIZE / 2) * 10.0f, terrain[x][z], (z - TERRAIN_SIZE / 2) * 10.0f);
-//             glVertex3f((x + 1 -TERRAIN_SIZE / 2) * 10.0f, terrain[x + 1][z], (z - TERRAIN_SIZE / 2) * 10.0f);
-//         }
-//         glEnd();
-//     }
-// }
+void DrawTerrain() {
+    glColor3f(0.2f, 0.8f, 0.2f); // Green terrain
+
+    for (int x = 0; x < TERRAIN_SIZE - 1; ++x) {
+        glBegin(GL_TRIANGLE_STRIP);
+        for (int z = 0; z < TERRAIN_SIZE; ++z) {
+            glVertex3f((x - TERRAIN_SIZE / 2) * 10.0f, terrain[x][z], (z - TERRAIN_SIZE / 2) * 10.0f);
+            glVertex3f((x + 1 -TERRAIN_SIZE / 2) * 10.0f, terrain[x + 1][z], (z - TERRAIN_SIZE / 2) * 10.0f);
+        }
+        glEnd();
+    }
+}
 
 // Draw HUD
 void DrawHUD() {
@@ -281,28 +259,6 @@ void UpdatePhysics() {
     if (yaw < 0.0f) yaw += 360.0f;
 }
 
-// Set up projection matrix
-void SetupProjection(GLFWwindow* window) {
-    int width, height;
-    glfwGetFramebufferSize(window, &width, &height);
-    if (height == 0) height = 1;
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
-    glMatrixMode(GL_MODELVIEW);
-}
-
-// Framebuffer size callback
-void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
-    if (height == 0) height = 1;
-    glViewport(0, 0, width, height);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
-    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
-    glMatrixMode(GL_MODELVIEW);
-}
-
 // Render the scene
 void RenderScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -319,8 +275,8 @@ void RenderScene() {
               aircraftX, aircraftY, aircraftZ,
               0.0f, 1.0f, 0.0f);
 
-    // Draw terrain (disabled for debug)
-    // DrawTerrain();
+    // Draw terrain
+    DrawTerrain();
 
     // Draw aircraft
     DrawAircraft();
@@ -330,41 +286,19 @@ void RenderScene() {
 }
 
 int main() {
-    // Set GLFW error callback for detailed error messages
-    glfwSetErrorCallback([](int error, const char* description) {
-        fprintf(stderr, "GLFW Error (%d): %s\n", error, description);
-    });
-
-    // Check DISPLAY environment variable (for X11)
-    const char* displayEnv = getenv("DISPLAY");
-    if (!displayEnv || displayEnv[0] == '\0') {
-        fprintf(stderr, "WARNING: DISPLAY environment variable is not set. No graphical output will be possible.\n");
-    } else {
-        printf("DISPLAY variable: %s\n", displayEnv);
-    }
-
     if (!glfwInit()) {
-        fprintf(stderr, "Failed to initialize GLFW!\n");
         return -1;
     }
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "Flight Simulator", nullptr, nullptr);
     if (!window) {
-        fprintf(stderr, "Failed to create GLFW window!\n");
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
-    printf("OpenGL context and window created successfully.\n");
-
-    // Set up projection matrix
-    SetupProjection(window);
-    // Set framebuffer resize callback
-    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     InitOpenGL();
-    printf("OpenGL initialized. Entering main loop.\n");
 
     while (!glfwWindowShouldClose(window)) {
         HandleInput(window);
@@ -374,7 +308,6 @@ int main() {
         glfwPollEvents();
     }
 
-    printf("Exiting main loop. Cleaning up.\n");
     glfwDestroyWindow(window);
     glfwTerminate();
 
