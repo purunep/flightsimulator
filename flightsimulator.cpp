@@ -291,6 +291,14 @@ int main() {
         fprintf(stderr, "GLFW Error (%d): %s\n", error, description);
     });
 
+    // Check DISPLAY environment variable (for X11)
+    const char* displayEnv = getenv("DISPLAY");
+    if (!displayEnv || displayEnv[0] == '\0') {
+        fprintf(stderr, "WARNING: DISPLAY environment variable is not set. No graphical output will be possible.\n");
+    } else {
+        printf("DISPLAY variable: %s\n", displayEnv);
+    }
+
     if (!glfwInit()) {
         fprintf(stderr, "Failed to initialize GLFW!\n");
         return -1;
