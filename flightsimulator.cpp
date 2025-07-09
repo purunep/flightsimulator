@@ -99,8 +99,29 @@ void DrawAircraft() {
     glVertex3f(-10.0f, 0.0f, 2.0f);
     glEnd();
 
+    // DEBUG: Draw a large white cube at the aircraft position
+    glColor3f(1.0f, 1.0f, 1.0f);
+    float s = 5.0f;
+    glBegin(GL_QUADS);
+    // Front face
+    glVertex3f(-s, -s,  s); glVertex3f( s, -s,  s); glVertex3f( s,  s,  s); glVertex3f(-s,  s,  s);
+    // Back face
+    glVertex3f(-s, -s, -s); glVertex3f(-s,  s, -s); glVertex3f( s,  s, -s); glVertex3f( s, -s, -s);
+    // Left face
+    glVertex3f(-s, -s, -s); glVertex3f(-s, -s,  s); glVertex3f(-s,  s,  s); glVertex3f(-s,  s, -s);
+    // Right face
+    glVertex3f( s, -s, -s); glVertex3f( s,  s, -s); glVertex3f( s,  s,  s); glVertex3f( s, -s,  s);
+    // Top face
+    glVertex3f(-s,  s, -s); glVertex3f(-s,  s,  s); glVertex3f( s,  s,  s); glVertex3f( s,  s, -s);
+    // Bottom face
+    glVertex3f(-s, -s, -s); glVertex3f( s, -s, -s); glVertex3f( s, -s,  s); glVertex3f(-s, -s,  s);
+    glEnd();
+
     glEnable(GL_LIGHTING);
     glPopMatrix();
+
+    // DEBUG: Print aircraft position
+    printf("Aircraft position: X=%.2f Y=%.2f Z=%.2f\n", aircraftX, aircraftY, aircraftZ);
 }
 
 // Draw terrain
