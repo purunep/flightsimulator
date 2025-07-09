@@ -34,6 +34,8 @@ void DrawAircraft();
 void DrawTerrain();
 void DrawHUD();
 void GenerateTerrain();
+void SetupProjection(GLFWwindow* window);
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 // Generate simple terrain
 void GenerateTerrain() {
@@ -279,6 +281,28 @@ void UpdatePhysics() {
     if (yaw < 0.0f) yaw += 360.0f;
 }
 
+// Set up projection matrix
+void SetupProjection(GLFWwindow* window) {
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    if (height == 0) height = 1;
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+// Framebuffer size callback
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    if (height == 0) height = 1;
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+}
+
 // Render the scene
 void RenderScene() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -333,6 +357,11 @@ int main() {
 
     glfwMakeContextCurrent(window);
     printf("OpenGL context and window created successfully.\n");
+
+    // Set up projection matrix
+    SetupProjection(window);
+    // Set framebuffer resize callback
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     InitOpenGL();
     printf("OpenGL initialized. Entering main loop.\n");
