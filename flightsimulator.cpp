@@ -11,7 +11,7 @@
 std::array<bool, 256> keys;
 
 // Flight variables
-float aircraftX = 0.0f, aircraftY = 50.0f, aircraftZ = 0.0f;
+float aircraftX = 0.0f, aircraftY = 150.0f, aircraftZ = 0.0f; // Force aircraft high above terrain for debug
 float pitch = 0.0f, yaw = 0.0f, roll = 0.0f;
 float velocity = 2.0f;  // Start with some default velocity
 float throttle = 0.3f;  // Start with 30% throttle
@@ -125,18 +125,17 @@ void DrawAircraft() {
 }
 
 // Draw terrain
-void DrawTerrain() {
-    glColor3f(0.2f, 0.8f, 0.2f); // Green terrain
-
-    for (int x = 0; x < TERRAIN_SIZE - 1; ++x) {
-        glBegin(GL_TRIANGLE_STRIP);
-        for (int z = 0; z < TERRAIN_SIZE; ++z) {
-            glVertex3f((x - TERRAIN_SIZE / 2) * 10.0f, terrain[x][z], (z - TERRAIN_SIZE / 2) * 10.0f);
-            glVertex3f((x + 1 -TERRAIN_SIZE / 2) * 10.0f, terrain[x + 1][z], (z - TERRAIN_SIZE / 2) * 10.0f);
-        }
-        glEnd();
-    }
-}
+// void DrawTerrain() {
+//     glColor3f(0.2f, 0.8f, 0.2f); // Green terrain
+//     for (int x = 0; x < TERRAIN_SIZE - 1; ++x) {
+//         glBegin(GL_TRIANGLE_STRIP);
+//         for (int z = 0; z < TERRAIN_SIZE; ++z) {
+//             glVertex3f((x - TERRAIN_SIZE / 2) * 10.0f, terrain[x][z], (z - TERRAIN_SIZE / 2) * 10.0f);
+//             glVertex3f((x + 1 -TERRAIN_SIZE / 2) * 10.0f, terrain[x + 1][z], (z - TERRAIN_SIZE / 2) * 10.0f);
+//         }
+//         glEnd();
+//     }
+// }
 
 // Draw HUD
 void DrawHUD() {
@@ -296,8 +295,8 @@ void RenderScene() {
               aircraftX, aircraftY, aircraftZ,
               0.0f, 1.0f, 0.0f);
 
-    // Draw terrain
-    DrawTerrain();
+    // Draw terrain (disabled for debug)
+    // DrawTerrain();
 
     // Draw aircraft
     DrawAircraft();
