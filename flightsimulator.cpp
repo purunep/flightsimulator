@@ -34,6 +34,8 @@ void DrawAircraft();
 void DrawTerrain();
 void DrawHUD();
 void GenerateTerrain();
+void SetupProjection(GLFWwindow* window);
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height);
 
 // Generate simple terrain
 void GenerateTerrain() {
@@ -285,6 +287,26 @@ void RenderScene() {
     DrawHUD();
 }
 
+void SetupProjection(GLFWwindow* window) {
+    int width, height;
+    glfwGetFramebufferSize(window, &width, &height);
+    if (height == 0) height = 1;
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+}
+
+void FramebufferSizeCallback(GLFWwindow* window, int width, int height) {
+    if (height == 0) height = 1;
+    glViewport(0, 0, width, height);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    gluPerspective(45.0f, (float)width / (float)height, 1.0f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+}
+
 int main() {
     if (!glfwInit()) {
         return -1;
@@ -297,6 +319,11 @@ int main() {
     }
 
     glfwMakeContextCurrent(window);
+
+    // Set up projection matrix
+    SetupProjection(window);
+    // Set framebuffer resize callback
+    glfwSetFramebufferSizeCallback(window, FramebufferSizeCallback);
 
     InitOpenGL();
 
