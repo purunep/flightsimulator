@@ -286,19 +286,28 @@ void RenderScene() {
 }
 
 int main() {
+    // Set GLFW error callback for detailed error messages
+    glfwSetErrorCallback([](int error, const char* description) {
+        fprintf(stderr, "GLFW Error (%d): %s\n", error, description);
+    });
+
     if (!glfwInit()) {
+        fprintf(stderr, "Failed to initialize GLFW!\n");
         return -1;
     }
 
     GLFWwindow* window = glfwCreateWindow(800, 600, "Flight Simulator", nullptr, nullptr);
     if (!window) {
+        fprintf(stderr, "Failed to create GLFW window!\n");
         glfwTerminate();
         return -1;
     }
 
     glfwMakeContextCurrent(window);
+    printf("OpenGL context and window created successfully.\n");
 
     InitOpenGL();
+    printf("OpenGL initialized. Entering main loop.\n");
 
     while (!glfwWindowShouldClose(window)) {
         HandleInput(window);
@@ -308,6 +317,7 @@ int main() {
         glfwPollEvents();
     }
 
+    printf("Exiting main loop. Cleaning up.\n");
     glfwDestroyWindow(window);
     glfwTerminate();
 
